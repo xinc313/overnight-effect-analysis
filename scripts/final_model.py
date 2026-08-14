@@ -49,14 +49,34 @@ rows = [perf(w, "FINAL 全样本"),
         perf(w, "FINAL 2020至今", slice("2020", "2026"))]
 for row in rows: print(row)
 
-# comparison curves: FINAL vs S0 vs buy&hold (net 1bp for strategies)
+# comparison curves: FINAL vs S0 vs U0(every night) vs buy&hold (net 1bp)
 s0w = (prev <= 0).astype(float)
+u0w = pd.Series(1.0, index=on.index)
 curves = {}
-for key, w_ in [("final", w), ("s0", s0w)]:
+for key, w_ in [("final", w), ("s0", s0w), ("u0", u0w)]:
     net = (w_ * on - 2 * C * w_).dropna()
     curves[key] = (1 + net).cumprod().resample("ME").last()
 curves["bh"] = (1 + r["total"]).cumprod().dropna().resample("ME").last()
 cum = pd.DataFrame(curves).dropna()
+
+print("\n===== 对比表数字 (1bp/边) =====")
+for key, w_ in [("FINAL", w), ("S0 信号夜1x", s0w), ("U0 每天隔夜", u0w)]:
+    for per, sl in [("全样本", slice(None)), ("16-26", slice("2016", "2026")),
+                    ("25-26", slice("2025", "2026"))]:
+        net = (w_ * on - 2 * C * w_).loc[sl].dropna()
+        ny = len(net) / 252
+        cumx = (1 + net).cumprod()
+        print(f"{key:12s} {per:6s} 年化 {(cumx.iloc[-1]**(1/ny)-1)*100:6.2f}% "
+              f"夏普 {net.mean()/net.std()*np.sqrt(252):5.2f} "
+              f"回撤 {(cumx/cumx.cummax()-1).min()*100:6.1f}%")
+for per, sl in [("全样本", slice(None)), ("16-26", slice("2016", "2026")),
+                ("25-26", slice("2025", "2026"))]:
+    net = r["total"].loc[sl].dropna()
+    ny = len(net) / 252
+    cumx = (1 + net).cumprod()
+    print(f"{'B&H':12s} {per:6s} 年化 {(cumx.iloc[-1]**(1/ny)-1)*100:6.2f}% "
+          f"夏普 {net.mean()/net.std()*np.sqrt(252):5.2f} "
+          f"回撤 {(cumx/cumx.cummax()-1).min()*100:6.1f}%")
 
 # yearly returns of FINAL
 netf = (w * on - 2 * C * w).dropna()
