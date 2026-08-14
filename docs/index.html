@@ -360,10 +360,10 @@ code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: va
 <section id="panel5" role="tabpanel" aria-labelledby="tabbtn5" hidden>
 
   <div class="tiles">
-    <div class="tile"><div class="k">生产组合 · 近10年夏普</div><div class="v pos">1.07</div><div class="d">全窗口 0.80–1.07,从未失守</div></div>
-    <div class="tile"><div class="k">2025 / 2026 表现</div><div class="v pos">+2.7% / +4.6%</div><div class="d">在固定模型双双亏损的年份转正</div></div>
-    <div class="tile"><div class="k">GBM 近 1 年(样本外)</div><div class="v pos">+21.0%</div><div class="d">夏普 1.83,逐年重训无前视</div></div>
-    <div class="tile"><div class="k">19 个年度盈利年数</div><div class="v">18 / 19</div><div class="d">唯一亏损年:2008(−6.2%)</div></div>
+    <div class="tile"><div class="k">正式形态:固定模型 · 全样本夏普</div><div class="v pos">1.15</div><div class="d">2000–2026,年化 +10.4%,含 1bp/边</div></div>
+    <div class="tile"><div class="k">样本外夏普(2016–2026)</div><div class="v pos">1.06</div><div class="d">96 组合网格搜索的样本外冠军</div></div>
+    <div class="tile"><div class="k">最大回撤</div><div class="v">−17.7%</div><div class="d">对比 QQQ 买入持有 −83%</div></div>
+    <div class="tile"><div class="k">⚠️ 滚动 3 年夏普(当前)</div><div class="v neg">0.19</div><div class="d">26 年最低点,失效监控为强制项</div></div>
   </div>
 
   <h2>一、三代模型:从规则到学习</h2>
@@ -405,8 +405,16 @@ code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: va
     <li>自适应型组合训练段排 47–50、样本外冲到 7–9——regime 变化被独立确认。</li>
   </ul>
 
-  <h2>四、生产组合:固定 50% + GBM 50%</h2>
-  <p>两代模型日收益相关性不高(固定押回归、GBM 近年偏动量),各押一半即互为保险:</p>
+  <h2>四、正式形态:固定模型(备选方案留档对比)</h2>
+  <p><strong>经权衡,本研究采用固定模型为正式形态</strong>——它是全样本(1.15)与样本外(1.06)的双料冠军、96 组合穷举的最优解,规则透明可手工执行。这个选择的实质是<strong>押「均值回归会回来」</strong>:2025–26 它连续亏损(见下节归因),持有它意味着接受这类年份再次出现,并以第七节的失效红线为兜底。每晚收盘前五步:</p>
+  <ol>
+    <li><strong>信号</strong> — 昨夜隔夜收益(昨收 → 今开)是否 ≤ 0?否 → 空仓。</li>
+    <li><strong>周末剔除</strong> — 明早是否周一?是 → 空仓。</li>
+    <li><strong>连跌加仓</strong> — 连跌 1 夜 → 1x;2 夜 → 1.5x;≥3 夜 → 2x。</li>
+    <li><strong>波动率刹车</strong> — 仓位 ×(60 夜波动中位数 ÷ 当前 60 夜波动,限 0.5–2),总仓位封顶 2x。</li>
+    <li><strong>执行</strong> — 收盘 MOC 买入,次日开盘 MOO 卖出,无论盈亏。</li>
+  </ol>
+  <p>备选方案(GBM 与 50/50 组合)完整留档如下,供 regime 持续不利时切换:</p>
   <div class="tablewrap">
     <table aria-label="生产组合表现">
       <thead><tr><th>2008–2026,1bp/边</th><th>全期 年化/夏普/回撤</th><th>近10年</th><th>近5年</th><th>近3年</th><th>近1年</th></tr></thead>
@@ -418,7 +426,7 @@ code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: va
       </tbody>
     </table>
   </div>
-  <p>组合是唯一在五个窗口全部保持夏普 ≥0.80 的形态,回撤也最小(−15.2%)。</p>
+  <p>取舍一目了然:固定模型历史成绩最高但近端最差;组合是唯一五个窗口全部 ≥0.80 的形态。<strong>正式采用固定模型 = 用近端的痛换历史最高的期望</strong>,这笔账在第七节的红线保护下进行。</p>
 
   <div class="card">
     <h4>固定模型 vs GBM vs 生产组合 vs 买入持有(2008–2026,含 1bp/边成本)</h4>
@@ -445,23 +453,24 @@ code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: va
   </div>
 
   <h2>五、为什么需要三代:2025–26 的教训</h2>
-  <p>固定模型 27 年里首次连续两年亏损(2025 −7.6%、2026 YTD −2.8%),归因如下:隔夜效应本身依然健康(2025 隔夜段 +16.1%),但收益全部转移到了「前夜上涨后」的夜晚(+22.9%),固定模型持仓的「跌后夜」反而亏损(−5.9%)——<strong>支撑它 25 年的均值回归切换成了动量</strong>。我们检验过的所有直觉修法(持有更久、降频、涨后规则、regime 阈值切换)全部被数据否决;唯一通过检验的应对就是本页的两条:数据驱动的自适应/ML 分支,以及模型间分散。若还想要 β(不踏空牛市),用底仓混合:50% 买入持有 + 50% 本组合,牛市年跟上大盘、熊市年由模型腿护住。</p>
+  <p>固定模型 27 年里首次连续两年亏损(2025 −7.6%、2026 YTD −2.8%),归因如下:隔夜效应本身依然健康(2025 隔夜段 +16.1%),但收益全部转移到了「前夜上涨后」的夜晚(+22.9%),固定模型持仓的「跌后夜」反而亏损(−5.9%)——<strong>支撑它 25 年的均值回归切换成了动量</strong>。我们检验过的所有直觉修法(持有更久、降频、涨后规则、regime 阈值切换)全部被数据否决;通过检验的应对只有两类:数据驱动的自适应/ML 分支、以及模型间分散——两者都已在本页留档,作为第七节红线触发后的切换预案。若还想要 β(不踏空牛市),可用底仓混合:50% 买入持有 + 50% 模型。</p>
 
   <h2>六、执行细节与敞口旋钮</h2>
   <ul>
-    <li><strong>每晚流程</strong>:收盘前跑一次 GBM 打分(11 个因子当日均可得)+ 固定模型五步判断;两条腿各按 50% 资金独立执行;MOC 买入、次日 MOO 卖出。</li>
-    <li><strong>年度维护</strong>:每年 1 月重训一次 GBM;两腿权重固定 50/50,不按近期表现调整——调权重就是新的过拟合入口。</li>
-    <li><strong>敞口旋钮</strong>:组合近 10 年口径约 9.7%/年、回撤 −13%;基准仓位放大到 2x(保证金/期货)约 19%/年、回撤 −25%。想要更高绝对收益拧这里,不动信号。</li>
-    <li><strong>账户与税</strong>:约 260 笔/年(两腿合计),全部短期资本利得;PDT 与保证金要求同前;成本假设 1bp/边,用竞价单可达。</li>
+    <li><strong>每晚流程</strong>:收盘前按第四节五步判断,MOC 买入、次日 MOO 卖出;规则完全透明,可手工执行,无需模型打分。</li>
+    <li><strong>参数纪律</strong>:全部参数(1.5x/2x、60 夜、0.5–2、封顶 2x)为事先拍定,不再调优——网格搜索已证明这就是穷举最优,继续调只会过拟合。</li>
+    <li><strong>敞口旋钮</strong>:1x 基准约 10.4%/年、回撤 −17.7%;放大到 2x(保证金上限)约 20%/年、回撤 ~−33%。想要更高绝对收益拧这里,不动信号。</li>
+    <li><strong>账户与税</strong>:约 90 笔/年,全部短期资本利得;2x 需保证金账户(Reg-T 隔夜上限);成本假设 1bp/边,竞价单可达。</li>
   </ul>
 
-  <h2>七、失效监控:什么时候该停</h2>
+  <h2>七、失效监控:红线与预案(强制项)</h2>
+  <p>选择固定模型的前提是接受这份监控合同——<strong>当前滚动 3 年夏普 0.19,处于 26 年历史最低</strong>,黄灯已亮:</p>
   <ul>
-    <li><strong>组合滚动 3 年夏普 &lt; 0</strong> → 停止执行(2008 年以来从未发生;固定模型单腿当前 0.19,是它 26 年最低,组合腿的意义正在于此)。</li>
-    <li><strong>总览页隔夜/日内差距持续为零或倒挂</strong> → 效应根基消失(如 24 小时交易普及后),两腿同时失效。</li>
-    <li><strong>GBM 年度重训后样本外年度收益连续两年为负</strong> → 特征集已失去预测力,冻结 ML 腿。</li>
-    <li><strong>连败超出历史包络</strong>(固定腿 12+ 连败)→ 市场结构改变信号。</li>
-    <li>以上检查<strong>每季度例行复盘</strong>一次,写进日历——规则化退出与规则化进出场同样重要。</li>
+    <li><strong>红线 1:滚动 3 年夏普 &lt; 0</strong> → 立即停用固定模型,<strong>预案:切换到本页留档的 50/50 组合或 GBM</strong>——切换动作现在写定,届时不做临场判断。</li>
+    <li><strong>红线 2:信号夜胜率滚动两年 &lt; 50%</strong>(历史基线 58%)→ 同上处理。</li>
+    <li><strong>红线 3:总览页隔夜/日内差距持续为零或倒挂</strong> → 效应根基消失(如 24 小时交易普及),所有形态一并停用。</li>
+    <li><strong>红线 4:连败超出历史包络</strong>(12+ 连败,历史最长 8)→ 市场结构改变信号。</li>
+    <li>以上检查<strong>每季度例行复盘</strong>,写进日历——亏损年份里,执行这份合同比执行策略本身更难,也更重要。</li>
   </ul>
 </section>
 
