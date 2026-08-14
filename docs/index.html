@@ -444,9 +444,46 @@ code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: va
   </div>
   <p><strong>加仓策略的规则是「在最恐慌的夜晚持有最大仓位」</strong>——这正是它赚取溢价的原因,也是它的账单。基准仓位的绝对规模必须按「2x 仓位撞上 −8% 跳空」即 −16% 级别的单夜来设定;若在 TQQQ 上执行,同一场景约为 −45%。</p>
 
-  <h2>五、结论与警示</h2>
+  <h2>五、附加因子:胜率地图与一个负因子</h2>
+  <p>最后把三个候选因子(VIX 水平、星期几、财报季)在<strong>信号夜内部</strong>过一遍胜率,并对显著者做前后半样本检验:</p>
+  <div class="tablewrap">
+    <table aria-label="因子胜率地图">
+      <thead><tr><th>信号夜内部分组</th><th>胜率</th><th>日均</th><th>t 值</th><th>前后半样本</th><th>裁决</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">财报月 1/4/7/10</td><td><strong>62.5%</strong></td><td class="pos">+17.1bp</td><td>5.42</td><td>✅ 两半均 t&gt;3.5</td><td>✅ 最强正因子</td></tr>
+        <tr><td class="rowlab">非财报月</td><td>56.7%</td><td class="pos">+5.3bp</td><td class="dim">2.47</td><td>弱但为正</td><td class="dim">—</td></tr>
+        <tr><td class="rowlab">周一早卖(周末持仓)</td><td>55.3%</td><td class="neg">−2.5bp</td><td class="dim">−0.53</td><td>✅ 两半均 ≈0/负</td><td>⛔ 负因子,剔除</td></tr>
+        <tr><td class="rowlab">周三</td><td>63.4%</td><td class="pos">+14.5bp</td><td>4.37</td><td>✅ 稳定</td><td>⚠️ 机制不明,不用</td></tr>
+        <tr><td class="rowlab">VIX 20–30</td><td>59.2%</td><td class="pos">+14.7bp</td><td>3.90</td><td>❌ 不稳</td><td>❌ 已被 S3 覆盖</td></tr>
+        <tr><td class="rowlab">VIX &gt;30</td><td>56.1%</td><td class="pos">+11.9bp</td><td class="dim">1.29</td><td>❌ 噪音大</td><td>❌ 放弃</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>QQQ:信号夜按星期几分组的隔夜日均收益(bp,2000–2026)</h4>
+    <p class="note">「周一」= 周五收盘进场、周一早晨卖出(承担整个周末) · 悬停查看详情</p>
+    <div class="chartbox" id="wkbox">
+      <svg id="wksvg" viewBox="0 0 860 300" role="img" aria-label="星期几分组柱状图"></svg>
+      <div class="tip" id="wktip"></div>
+    </div>
+  </div>
+
+  <p><strong>最有价值的发现是个负因子:周末持仓一无所获。</strong>周五进场的信号夜期望 −2.5bp,是五组里唯一为负,且前后半样本一致——承担三天跳空风险换来零期望(与文献中的 Monday effect 一致)。把这类进场剔除后,四项指标全部改善,且这是做减法而非加因子,过拟合风险最低:</p>
+  <div class="tablewrap">
+    <table aria-label="跳过周末对比">
+      <thead><tr><th>QQQ 2000–2026(1bp/边)</th><th>年化</th><th>夏普</th><th>最大回撤</th><th>交易/年</th><th>单笔胜率</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">S0 基准</td><td class="pos">+7.7%</td><td>0.78</td><td class="neg">−20.4%</td><td>111</td><td>58.6%</td></tr>
+        <tr><td class="rowlab">S0a 跳过周末进场</td><td class="pos">+8.9%</td><td><strong>1.01</strong></td><td class="neg">−14.3%</td><td>90</td><td>59.3%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>财报月因子(胜率 62.5%,机制清晰)不建议做硬过滤——只做财报月会把年交易砍到 36 次、年化降到 5.4%,更适合作为认知或温和的仓位倾斜。周三的高胜率虽然统计强,但机制讲不清(pre-FOMC drift 只能解释一部分),按纪律不进策略。</p>
+
+  <h2>六、结论与警示</h2>
   <ul>
-    <li><strong>推荐的最终形态(研究结论,非投资建议)</strong>:信号 = 前夜隔夜下跌;开盘必卖;连跌加仓 1x/1.5x/2x;仓位再乘以波动率调整系数(60 夜波动中位数 ÷ 当前波动,限 0.5–2x)。即 S5,样本外夏普 0.75,对比买入持有的 0.45 与固定仓位基准的 0.61。</li>
+    <li><strong>推荐的最终形态(研究结论,非投资建议)</strong>:信号 = 前夜隔夜下跌<strong>且明早非周一</strong>;开盘必卖;连跌加仓 1x/1.5x/2x;仓位再乘以波动率调整系数(60 夜波动中位数 ÷ 当前波动,限 0.5–2x)。基准形态样本外夏普 0.75(S5),叠加周末剔除后全样本夏普升至 1 以上。</li>
     <li><strong>参数都是事先拍定的整数/默认值</strong>(1.5x、2x、60 夜、0.5–2 上下限),未做网格搜索——这是刻意的:每一次「再调优一下」都在把样本外衰减的账单加厚。</li>
     <li><strong>预期管理</strong>:训练段(2000–2015)到样本外(2016–2026)所有变体年化普遍衰减 2–4 个百分点,这是隔夜效应整体变弱的大环境(总览页第四节)。把回测夏普再打七折作为实盘预期比较诚实。</li>
     <li><strong>执行摩擦未建模</strong>:MOC/MOO 竞价单在极端日的成交偏移、加仓造成的资金占用波动、以及税务(全部短期资本利得)都不在回测内。</li>
@@ -1031,6 +1068,53 @@ function drawVarCum() {
       {name:"S5 组合",cssVar:"--s-cond",values:c.s5}]});
 }
 
+/* ---------- weekday bars on signal nights (tab 4) ---------- */
+const WK = [
+  {name:"周一(周末持仓)", bp:-2.48, win:55.3, t:-0.53, n:564},
+  {name:"周二", bp:14.18, win:59.6, t:3.90, n:606},
+  {name:"周三", bp:14.50, win:63.4, t:4.37, n:614},
+  {name:"周四", bp:11.67, win:57.3, t:2.95, n:585},
+  {name:"周五", bp:6.79, win:57.0, t:1.65, n:605}];
+function drawWk() {
+  const svg=document.getElementById("wksvg");
+  svg.innerHTML="";
+  const W=860, H=300, m={t:16,r:24,b:44,l:44};
+  const pw=W-m.l-m.r, ph=H-m.t-m.b;
+  let hi=0, lo=0;
+  for (const r of WK) { hi=Math.max(hi,r.bp); lo=Math.min(lo,r.bp); }
+  hi=Math.ceil(hi/5)*5; lo=Math.floor(lo/5)*5;
+  const Y=v=>m.t+ph*(1-(v-lo)/(hi-lo));
+  for (let t=lo;t<=hi;t+=5) {
+    svg.appendChild(el("line",{x1:m.l,x2:m.l+pw,y1:Y(t),y2:Y(t)},
+      `stroke:var(${t===0?"--baseline":"--grid"});stroke-width:1`));
+    const lab=el("text",{x:m.l-8,y:Y(t)+4,"text-anchor":"end"},"fill:var(--muted);font-size:12px");
+    lab.textContent=t; svg.appendChild(lab);
+  }
+  const box=document.getElementById("wkbox"), tip=document.getElementById("wktip");
+  const gw=pw/WK.length, bw=Math.min(70,gw-40);
+  WK.forEach((r,i)=>{
+    const x=m.l+gw*i+(gw-bw)/2, y0=Y(0), y1=Y(r.bp);
+    const rect=el("rect",{x:fmt(x,1),y:fmt(Math.min(y0,y1),1),
+      width:fmt(bw,1),height:fmt(Math.max(1.5,Math.abs(y1-y0)),1),rx:3},
+      r.bp<0?"fill:var(--bad)":"fill:var(--s-on)");
+    rect.addEventListener("mousemove",(ev)=>{
+      const rb=box.getBoundingClientRect();
+      tip.innerHTML=`<b>${r.name}</b><br>日均 <b class="num">${r.bp>0?"+":""}${fmt(r.bp,1)} bp</b> · 胜率 ${fmt(r.win,1)}%<br>t = ${fmt(r.t,2)} · n = ${r.n.toLocaleString()}`;
+      tip.style.display="block";
+      tip.style.left=Math.min(rb.width-200,Math.max(4,ev.clientX-rb.left+12))+"px";
+      tip.style.top=(ev.clientY-rb.top-58)+"px";
+    });
+    rect.addEventListener("mouseleave",()=>tip.style.display="none");
+    svg.appendChild(rect);
+    const val=el("text",{x:x+bw/2,y:(r.bp>=0?y1-6:y1+16),"text-anchor":"middle"},
+      "fill:var(--ink-2);font-size:11.5px;font-weight:600");
+    val.textContent=fmt(r.bp,1);
+    svg.appendChild(val);
+    const lab=el("text",{x:x+bw/2,y:H-22,"text-anchor":"middle"},"fill:var(--muted);font-size:11.5px");
+    lab.textContent=r.name; svg.appendChild(lab);
+  });
+}
+
 function redraw(){
   drawCum(); drawYr(); drawStats(); drawCosts();
   drawCond(); drawStab(); drawQuint(); drawCCum(); drawCCost();
@@ -1057,4 +1141,5 @@ drawStreak();
 drawT3Cum();
 drawMag();
 drawVarCum();
+drawWk();
 </script>

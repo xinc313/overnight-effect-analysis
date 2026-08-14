@@ -38,6 +38,7 @@ python scripts/export_cond.py       # 条件策略回测 + 导出第二个标签
 python scripts/tqqq_streak.py       # TQQQ、连跌分组与退出政策回测
 python scripts/export_tab3.py       # 导出第三个标签页数据
 python scripts/strategies.py        # 策略变体(加仓/波动率目标)+ 样本外检验
+python scripts/factors.py           # 附加因子: VIX/星期几/财报季 胜率地图
 python scripts/export_tab4.py       # 导出第四个标签页数据
 ```
 

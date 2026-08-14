@@ -13,3 +13,9 @@ for ticker in ["SPY", "QQQ", "TQQQ"]:
         df.columns = df.columns.get_level_values(0)
     df.to_csv(f"{OUT}/{ticker}.csv")
     print(ticker, len(df), df.index[0].date(), "->", df.index[-1].date())
+
+vix = yf.download("^VIX", start="2000-01-01", auto_adjust=True, progress=False)
+if isinstance(vix.columns, pd.MultiIndex):
+    vix.columns = vix.columns.get_level_values(0)
+vix[["Close"]].to_csv(f"{OUT}/VIX.csv")
+print("VIX", len(vix))
