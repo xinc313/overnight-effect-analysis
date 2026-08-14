@@ -7,7 +7,7 @@ OUT = Path(__file__).resolve().parent.parent / "data"
 OUT.mkdir(exist_ok=True)
 OUT = str(OUT)
 
-for ticker in ["SPY", "QQQ"]:
+for ticker in ["SPY", "QQQ", "TQQQ"]:
     df = yf.download(ticker, start="2000-01-01", auto_adjust=True, progress=False)
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
